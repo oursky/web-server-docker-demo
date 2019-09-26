@@ -8,9 +8,7 @@ const HOST = "0.0.0.0";
 
 const app = express();
 
-const mongoDBUrl = process.env.MONGO_DB_URL;
-
-mongoose.connect(mongoDBUrl, { useNewUrlParser: true });
+mongoose.connect("mongodb://db:27017/todo", { useNewUrlParser: true });
 
 const Todo = mongoose.model("Todo", {
   name: String,
@@ -24,7 +22,7 @@ app.get("/", (_, res) => {
   res.send("You have reached the root of the server");
 });
 
-app.post("/new_todo", (req, res) => {
+app.post("/todo", (req, res) => {
   if (req.body.name && req.body.value) {
     const { name, value } = req.body;
     const todo = new Todo({ name, value, createdAt: new Date() });
@@ -36,6 +34,13 @@ app.post("/new_todo", (req, res) => {
   } else {
     return res.send("your request payload is invalid");
   }
+});
+
+app.get("/todos", (_, res) => {
+  Todo.find(function(err, todos) {
+    console.log("get /todos: ", todos);
+    res.send(todos);
+  });
 });
 
 app.listen(PORT, HOST);
